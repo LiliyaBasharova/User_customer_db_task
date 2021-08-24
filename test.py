@@ -7,7 +7,7 @@ from db_utils import DbUtils
 db_utils = DbUtils(engine)
 
 
-def test_insert():
+def test_insert_user():
     old_users = list(db_utils.get_all_users())
 
     name = 'test_name'
@@ -30,28 +30,22 @@ def test_insert():
     assert user.address == address
     assert user.tel == tel
 
-    def test_insert():
-        old_customer = list(db_utils.get_all_customer())
+def test_insert_customer():
+        old_customers = list(db_utils.get_all_customer())
 
         name = 'test_name'
-        address = 'qwerty'
-        tel = '123456789'
         data = {
             'name': name,
-            'address': address,
-            'tel': tel,
-            'id': len(old_users) + 1,
+            'id': len(old_customers) + 1,
         }
 
-        db_utils.insert_user(**data)
+        db_utils.insert_customer(**data)
 
-        users = list(db_utils.get_all_users())
+        customers = list(db_utils.get_all_customer())
 
-        assert len(users) == len(old_users) + 1
-        user = users[-1]
-        assert user.name == name, 'Неверное имя'
-        assert user.address == address
-        assert user.tel == tel
+        assert len(customers) == len(old_customers) + 1
+        customer = customers[-1]
+        assert customer.name == name, 'Неверное имя'
 
 
 def test_create_catalog():
