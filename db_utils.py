@@ -1,4 +1,6 @@
-from sqlalchemy import delete
+from typing import List
+
+from sqlalchemy import delete, literal_column
 from sqlalchemy import insert
 from sqlalchemy import update
 from sqlalchemy.orm import sessionmaker
@@ -61,7 +63,7 @@ class DbUtils:
     #     )
     #     self.session.execute(update_table)
 
-    def get_customers_by_user(self, user_id) -> list[Customer]:
+    def get_customers_by_user(self, user_id) -> List[Customer]:
         user_customers = self.session.query(UserCustomer).filter_by(user_id=user_id)
         customers_ids = [user_customer.customer_id for user_customer in user_customers]
         customers = self.session.query(Customer).filter(Customer.id.in_(customers_ids))
@@ -76,20 +78,21 @@ class DbUtils:
 
     def insert_user(self, **kwargs) -> Users:
         insert_user = (
-            insert(Users).values(**kwargs)
+            insert(Users).values(**kwargs).returning(literal_column('*'))
         )
         result = self.session.execute(insert_user)
         self.session.commit()
-        return result
-
+        fetched = result.fetchone()
+        return Users(**fetched)
 
     def insert_customer(self, **kwargs) -> Customer:
         insert_customer = (
-        insert(Customer).values(**kwargs)
+        insert(Customer).values(**kwargs).returning(literal_column('*'))
     )
         result = self.session.execute(insert_customer)
         self.session.commit()
-        return result
+        fetched = result.fetchone()
+        return Customer(**fetched)
 
     def update_user(self, user_id, **kwargs ):
         update_table = (

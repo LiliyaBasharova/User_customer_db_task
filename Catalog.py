@@ -1,3 +1,4 @@
+from typing import List, Dict
 from db_utils import DbUtils
 from data import UserCustomer, Users, Customer
 from sqlalchemy import delete
@@ -6,10 +7,10 @@ from sqlalchemy import update
 
 class Catalog:
     db_utils: DbUtils = None
-    users: list[Users] = None
-    customers: list[Customer] = None
+    users: List[Users] = None
+    customers: List[Customer] = None
     
-    user_customer: dict[int, list[Customer]] = None
+    user_customer: Dict[int, List[Customer]] = None
     
     def __init__(self, engine):
         db_utils = DbUtils(engine=engine)
