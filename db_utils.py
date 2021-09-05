@@ -5,7 +5,7 @@ from sqlalchemy import insert
 from sqlalchemy import update
 from sqlalchemy.orm import sessionmaker
 
-from data import Users, Customer, engine, UserCustomer
+from data import Samples, Mutation, engine, Samplemutation
 
 
 class DbUtils:
@@ -16,121 +16,78 @@ class DbUtils:
         Session = sessionmaker(bind=engine)
         self.session = Session()
 
+    def get_all_samples(self):
+        return self.session.query(Samples).order_by(Samples.id)
 
-    def create_test_users(self):
-        for user_id in range(1, 11):
-            user = Users(id=user_id, name=f"test_{user_id}", address="test address", tel="test tel")
-            self.session.add(user)
-        self.session.commit()
+    def get_all_mutation(self):
+        return self.session.query(Mutation).order_by(Mutation.id)
 
-    def create_test_customers(self):
-        for customer_id in range(1, 11):
-            customer = Customer(id=customer_id, name=f"customer_{customer_id}")
-            self.session.add(customer)
-        self.session.commit()
-
-    def get_all_users(self):
-        return self.session.query(Users).order_by(Users.id)
-
-    def get_all_customer(self):
-        return self.session.query(Customer).order_by(Customer.id)
-
-    # def read_all_users(self):
-    #     for instance in self.get_all_users():
-    #         print(instance.name)
-    #
-    # def read_all_customers(self):
-    #     for instance in self.get_all_customer():
-    #         print(instance.name)
-
-    def delete_users(self, id):
-        delete_user = (
-            delete(Users).where(Users.id == id)
+    def delete_samples(self, id):
+        delete_sample = (
+            delete(Samples).where(Samples.id == id)
         )
-        self.session.execute(delete_user)
+        self.session.execute(delete_sample)
 
-    # def test_insert_user(self):
-    #     insert_user = (
-    #         insert(Users).values(name='username', address='')
-    #     )
-    #     self.session.execute(insert_user)
-    #
-    # def test_update_user(self):
-    #     update_table = (
-    #         update(Users).
-    #             where(Users.id == 5).
-    #             values(name='user #5')
-    #     )
-    #     self.session.execute(update_table)
+    def get_mutations_by_sample(self, sample_id) -> List[Mutation]:
+        sample_mutations = self.session.query(Samplemutation).filter_by(sample_id=sample_id)
+        mutations_ids = [sample_mutation.mutation_id for sample_mutation in sample_mutations]
+        mutations = self.session.query(Mutation).filter(Mutation.id.in_(mutations_ids))
+        return mutations
 
-    def get_customers_by_user(self, user_id) -> List[Customer]:
-        user_customers = self.session.query(UserCustomer).filter_by(user_id=user_id)
-        customers_ids = [user_customer.customer_id for user_customer in user_customers]
-        customers = self.session.query(Customer).filter(Customer.id.in_(customers_ids))
-        return customers
-
-    def create_user_customer(self):
-        for user_id in range(1, 11):
-            for customer_id in range(1, 11):
-                user_customer = UserCustomer(user_id=user_id, customer_id=customer_id)
-                self.session.add(user_customer)
+    def create_sample_mutation(self):
+        for sample_id in range(1, 11):
+            for mutation_id in range(1, 11):
+                sample_mutation = Samplemutation(sample_id=sample_id, mutation_id=mutation_id)
+                self.session.add(sample_mutation)
         self.session.commit()
 
-    def insert_user(self, **kwargs) -> Users:
-        insert_user = (
-            insert(Users).values(**kwargs).returning(literal_column('*'))
+    def insert_sample(self, **kwargs) -> Samples:
+        insert_sample = (
+            insert(Samples).values(**kwargs).returning(literal_column('*'))
         )
-        result = self.session.execute(insert_user)
+        result = self.session.execute(insert_sample)
         self.session.commit()
         fetched = result.fetchone()
-        return Users(**fetched)
+        return Samples(**fetched)
 
-    def insert_customer(self, **kwargs) -> Customer:
-        insert_customer = (
-        insert(Customer).values(**kwargs).returning(literal_column('*'))
-    )
-        result = self.session.execute(insert_customer)
+    def insert_mutation(self, **kwargs) -> Mutation:
+        insert_mutation = (
+            insert(Mutation).values(**kwargs).returning(literal_column('*'))
+        )
+        result = self.session.execute(insert_mutation)
         self.session.commit()
         fetched = result.fetchone()
-        return Customer(**fetched)
+        return Mutation(**fetched)
 
-    def update_user(self, user_id, **kwargs ):
+    def update_sample(self, sample_id, **kwargs):
         update_table = (
-            update(Users).
-                where(Users.id ==user_id ).
+            update(Samples).
+                where(Samples.id == sample_id).
                 values(**kwargs)
         )
         self.session.execute(update_table)
         self.session.commit()
 
-    def update_customer(self, customer_id, **kwargs):
+    def update_mutation(self, mutation_id, **kwargs):
         update_table = (
-            update(Customer).
-                where(Customer.id == customer_id).
+            update(Mutation).
+                where(Mutation.id == mutation_id).
                 values(**kwargs)
         )
         self.session.execute(update_table)
         self.session.commit()
 
-    def add_customer_to_user(self, user_id, customer_id) -> UserCustomer:
-        query = insert(UserCustomer).values(user_id=user_id, customer_id=customer_id)
+    def add_mutation_to_sample(self, sample_id, mutation_id) -> Samplemutation:
+        query = insert(Samplemutation).values(sample_id=sample_id, mutation_id=mutation_id)
         result = self.session.execute(query)
         self.session.commit()
         return result
 
-    def delete_customer_from_user(self, user_id, customer_id):
-        query = delete(UserCustomer).where(UserCustomer.user_id==user_id, UserCustomer.customer_id==customer_id)
+    def delete_mutation_from_sample(self, sample_id, mutation_id):
+        query = delete(Samplemutation).where(Samplemutation.sample_id == sample_id,
+                                             Samplemutation.mutation_id == mutation_id)
         self.session.execute(query)
         self.session.commit()
 
 
-db_utils = DbUtils(engine=engine)
-db_utils.create_test_users()
-db_utils.create_test_customers()
-db_utils.create_user_customer()
-for user in db_utils.get_all_users():
-    b = db_utils.get_customers_by_user(user.id)
-    print(b)
-    for _b in b:
-        print(_b)
 

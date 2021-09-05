@@ -1,56 +1,56 @@
 from typing import List, Dict
 from db_utils import DbUtils
-from data import UserCustomer, Users, Customer
+from data import Samplemutation, Samples, Mutation
 from sqlalchemy import delete
 from sqlalchemy import insert
 from sqlalchemy import update
 
 class Catalog:
     db_utils: DbUtils = None
-    users: List[Users] = None
-    customers: List[Customer] = None
+    samples: List[Samples] = None
+    mutations: List[Mutation] = None
     
-    user_customer: Dict[int, List[Customer]] = None
+    sample_mutation: Dict[int, List[Mutation]] = None
     
     def __init__(self, engine):
         db_utils = DbUtils(engine=engine)
         self.db_utils = db_utils
 
-        self.users = list(db_utils.get_all_users())
-        self.customers = list(db_utils.get_all_customer())
+        self.samples = list(db_utils.get_all_samples())
+        self.mutations = list(db_utils.get_all_mutation())
         
-        self.user_customer = {}
-        for user in self.users:
-            self.user_customer[user.id] = db_utils.get_customers_by_user(user.id)
+        self.sample_mutation = {}
+        for sample in self.samples:
+            self.sample_mutation[sample.id] = db_utils.get_mutations_by_sample(sample.id)
 
 
-    def insert_user(self, **kwargs) -> Users:
-        new_user = self.db_utils.insert_user(**kwargs)
-        self.users.append(new_user)
-        return new_user
+    def insert_sample(self, **kwargs) -> samples:
+        new_sample = self.db_utils.insert_sample(**kwargs)
+        self.samples.append(new_sample)
+        return new_sample
 
-    def insert_customer(self, **kwargs) -> Customer:
-        new_customer = self.db_utils.insert_customer(**kwargs)
-        self.customers.append(new_customer)
-        return new_customer
+    def insert_mutation(self, **kwargs) -> Mutation:
+        new_mutation = self.db_utils.insert_mutation(**kwargs)
+        self.mutations.append(new_mutation)
+        return new_mutation
 
-    def update_user(self, **kwargs):
-        self.db_utils.update_user(**kwargs)
+    def update_sample(self, **kwargs):
+        self.db_utils.update_sample(**kwargs)
 
-    def update_customer(self, **kwargs):
-        self.db_utils.update_customer(**kwargs)
+    def update_mutation(self, **kwargs):
+        self.db_utils.update_mutation(**kwargs)
 
-    def add_customer_to_user(self, user_id, customer_id):
-        new_user_customer = self.db_utils.add_customer_to_user(user_id, customer_id)
-        self.user_customer[user_id] = self.db_utils.get_customers_by_user(user_id)
+    def add_mutation_to_sample(self, sample_id, mutation_id):
+        new_sample_mutation = self.db_utils.add_mutation_to_sample(sample_id, mutation_id)
+        self.sample_mutation[sample_id] = self.db_utils.get_mutations_by_sample(sample_id)
 
-    def delete_customer_from_user(self, user_id, customer_id):
-        self.db_utils.delete_customer_from_user(user_id, customer_id)
-        self.user_customer[user_id] = [customer for customer in self.user_customer[user_id] if customer.id != customer_id]
+    def delete_mutation_from_sample(self, sample_id, mutation_id):
+        self.db_utils.delete_mutation_from_sample(sample_id, mutation_id)
+        self.sample_mutation[sample_id] = [mutation for mutation in self.sample_mutation[sample_id] if mutation.id != mutation_id]
 
-    def read_users(self):
-        return self.db_utils.get_all_users()
+    def read_samples(self):
+        return self.db_utils.get_all_samples()
 
-    def read_customer(self):
-        return self.db_utils.get_all_customer()
+    def read_mutation(self):
+        return self.db_utils.get_all_mutation()
 
