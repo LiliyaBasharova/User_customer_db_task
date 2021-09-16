@@ -42,9 +42,10 @@ class Catalog:
     def update_mutation(self, **kwargs):
        return self.db_utils.update_mutation(**kwargs)
 
-    def add_mutation_to_sample(self, sample_id, mutation_id):
+    def add_mutation_to_sample(self, sample_id: int, mutation_id: int) -> List[Mutation]:
         new_sample_mutation = self.db_utils.add_mutation_to_sample(sample_id, mutation_id)
         self.sample_mutation[sample_id] = self.db_utils.get_mutations_by_sample(sample_id)
+        return self.sample_mutation[sample_id]
 
     def delete_mutation_from_sample(self, sample_id, mutation_id):
         self.db_utils.delete_mutation_from_sample(sample_id, mutation_id)

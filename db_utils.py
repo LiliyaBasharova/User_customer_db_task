@@ -84,7 +84,7 @@ class DbUtils:
         update_table = (
             update(Samples).
                 where(Samples.id == sample_id).
-                values(**kwargs)
+                values(**kwargs).returning(literal_column('*'))
         )
         result = session.execute(update_table)
         session.commit()
@@ -97,7 +97,7 @@ class DbUtils:
         update_table = (
             update(Mutation).
                 where(Mutation.id == mutation_id).
-                values(**kwargs)
+                values(**kwargs).returning(literal_column('*'))
         )
         result = session.execute(update_table)
         session.commit()
