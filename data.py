@@ -22,7 +22,7 @@ class Samples(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(250), nullable=False)
     mutations = relationship('Mutation')
-    sqlalchemy.UniqueConstraint('id', 'name', )
+    sqlalchemy.UniqueConstraint('id', 'name')
 
     def __eq__(self, other):
         return self.id == other.id
@@ -30,20 +30,33 @@ class Samples(Base):
     def __str__(self):
         return f"Sample name={self.name}"
 
+    def create_dict_samples(sample):
+        dict_sample = {
+            "id": sample.id,
+            "name": sample.name
+        }
+        return dict_sample
+
+
 
 class Mutation(Base):
     __tablename__ = "mutation"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(Integer, nullable=False)
+    count = Column(Integer, nullable=False)
     sample_id = Column(Integer, ForeignKey("samples.id"))
-    sqlalchemy.UniqueConstraint('id', 'name')
+    sqlalchemy.UniqueConstraint('id', 'count')
 
     def __eq__(self, other):
         return self.id == other.id
 
     def __str__(self):
-        return f"Mutation name={self.name}"
-
+        return f"Mutation name={self.count}"
+    def create_dict_mutation(mutation):
+        dict_mutation = {
+            "id": mutation.id,
+            "count": mutation.count
+        }
+        return dict_mutation
 
 class Samplemutation(Base):
     __tablename__ = "sample_mutation"

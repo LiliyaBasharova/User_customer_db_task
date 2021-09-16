@@ -4,6 +4,7 @@ from data import Samplemutation, Samples, Mutation
 from sqlalchemy import delete
 from sqlalchemy import insert
 from sqlalchemy import update
+from requests import *
 
 class Catalog:
     db_utils: DbUtils = None
@@ -25,6 +26,7 @@ class Catalog:
 
 
     def insert_sample(self, **kwargs) -> samples:
+        print(kwargs)
         new_sample = self.db_utils.insert_sample(**kwargs)
         self.samples.append(new_sample)
         return new_sample
@@ -35,10 +37,10 @@ class Catalog:
         return new_mutation
 
     def update_sample(self, **kwargs):
-        self.db_utils.update_sample(**kwargs)
+        return self.db_utils.update_sample(**kwargs)
 
     def update_mutation(self, **kwargs):
-        self.db_utils.update_mutation(**kwargs)
+       return self.db_utils.update_mutation(**kwargs)
 
     def add_mutation_to_sample(self, sample_id, mutation_id):
         new_sample_mutation = self.db_utils.add_mutation_to_sample(sample_id, mutation_id)
@@ -54,3 +56,12 @@ class Catalog:
     def read_mutation(self):
         return self.db_utils.get_all_mutation()
 
+    def create_dict_catalog(self):
+        samples = []
+        mutations = []
+        for sample in self.read_samples():
+            samples.append(sample.create_dict_samples())
+        for mutation in self.read_mutation():
+            mutations.append(mutation.create_dict_mutation())
+
+        return ({'FirstKey':samples,'Secondkey':mutations})

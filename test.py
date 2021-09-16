@@ -26,9 +26,9 @@ def test_insert_sample():
 def test_insert_mutation():
     old_mutations = list(db_utils.get_all_mutation())
 
-    name = 'test_name'
+    count = 10
     data = {
-        'name': name,
+        'count': count,
         'id': len(old_mutations) + 1,
     }
 
@@ -38,7 +38,7 @@ def test_insert_mutation():
 
     assert len(mutations) == len(old_mutations) + 1
     mutation = mutations[-1]
-    assert mutation.name == name, 'Неверное имя'
+    assert mutation.count == count, 'Неверное количество'
 
 
 def test_create_catalog():
@@ -74,9 +74,9 @@ def test_update_catalog():
     assert sample.name == name, 'Неверное имя'
 
     old_mutations = list(catalog.read_mutation())
-    name = 'test_name'
+    count = 10
     data = {
-        'name': name,
+        'count': count,
         'id': len(old_mutations) + 1,
     }
 
@@ -85,7 +85,7 @@ def test_update_catalog():
 
     assert len(new_mutations) == len(old_mutations) + 1
     mutation = new_mutations[-1]
-    assert mutation.name == name, 'Неверное имя'
+    assert mutation.count == count, 'Неверное имя'
 
     assert len(catalog.samples) == len(new_samples)
     for i in range(len(samples)):
